@@ -1,0 +1,28 @@
+$fa-font-path: "./font-awesome/webfonts";
+
+@import "./font-awesome/scss/fontawesome.scss";
+@import "./font-awesome/scss/solid.scss";
+@import "./variables.scss";
+
+@import "./bulma/sass/utilities/_all.sass";
+@import "./bulma/sass/base/_all.sass";
+@import "./bulma/sass/grid/_all.sass";
+@import "./bulma/sass/elements/button.sass";
+@import "./bulma/sass/elements/form.sass";
+@import "./bulma/sass/elements/tag.sass";
+@import "./bulma/sass/elements/table.sass";
+@import "./bulma/sass/elements/other.sass";
+@import "./bulma/sass/components/tabs.sass";
+@import "./bulma/sass/components/modal.sass";
+@import "./bulma/sass/components/dropdown.sass";
+@import "./bulma/sass/components/card.sass";
+
+@import "~bulma-slider/dist/css/bulma-slider.sass";
+
+@import "./utils.scss";
+
+html {
+  background: white;
+  overflow: hidden;
+  font-size: 16px;
+}

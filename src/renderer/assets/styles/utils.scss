@@ -1,0 +1,32 @@
+.cl-full-width {
+  width: 100%;
+}
+
+.cl-full-height {
+  height: 100%;
+}
+
+.cl-flexbox-col-full {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+}
+
+.cl-flexbox-row-full {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
+}
+
+.cl-flexbox-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cl-flex-1 {
+  flex: 1;
+}
+

@@ -1,0 +1,134 @@
+import Tone from 'tone'
+import lamejs from 'lamejs'
+
+export let synth
+export let mixer = {}
+
+function volume2decibels(volume) {
+  return 48 * volume - 24
+}
+
+export function createSynth(config, master = true) {
+  switch (config.oscillator.sourceType) {
+    case 'am':
+    case 'fm':
+    case 'fat':
+      config.oscillator.type = config.oscillator.sourceType + config.oscillator.type
+      break
+    case 'pulse':
+    case 'pwm':
+      config.oscillator.type = config.oscillator.sourceType
+    default:
+  }
+  delete config.oscillator.sourceType
+  if (master) {
+    synth = new Tone.Synth(config)
+  } else {
+    return new Tone.Synth(config)
+  }
+}
+
+export function play(noteTime, volume = 1) {
+  let theSynth = synth
+  let note = new Tone.Frequency(theSynth.frequency.value).toNote()
+  theSynth.connect(Tone.Master)
+  theSynth.volume.setValueAtTime(volume2decibels(volume), 0)
+  theSynth.triggerAttackRelease(note, noteTime)
+}
+
+export function exportSynth(activeSynth) {
+  let noteTime = activeSynth.note
+  let config = activeSynth.synth
+  let envelope = config.envelope
+  let duration = envelope.attack + envelope.decay + envelope.sustain + envelope.release
+                + new Tone.Time(noteTime).toSeconds()
+
+  return Tone.Offline(Transport => {
+    let synth = createSynth(config, false).toMaster()
+    let note = new Tone.Frequency(synth.frequency.value).toNote()
+    synth.volume.setValueAtTime(volume2decibels(activeSynth.volume), 0)
+    synth.triggerAttackRelease(note, noteTime)
+    Transport.bpm.value = bpm
+    Transport.start()
+  }, duration).then(buffer => {
+    buffer = buffer.get()
+
+    var sampleRate = buffer.sampleRate
+    var numberOfChannels = buffer.numberOfChannels
+    var ld = buffer.getChannelData(0)
+    var rd = numberOfChannels > 1 ? buffer.getChannelData(1) : null
+
+    var lbuff = new Float32Array(ld.length)
+    var rbuff = new Float32Array(rd.length)
+
+    for(var i=0; i<ld.length;i++) {
+      lbuff[i] = ld[i] * 32767.5
+      rbuff[i] = rd[i] * 32767.5
+    }
+
+    var mp3Encoder = new lamejs.Mp3Encoder(2, sampleRate, 128)
+
+    var blockSize = 1152
+    var blocks = []
+    var mp3Buffer
+
+    var length = lbuff.length
+    for (var i = 0; i < length; i += blockSize) {
+      var lc = lbuff.subarray(i, i + blockSize)
+      var rc = rbuff.subarray(i, i + blockSize)
+      mp3Buffer = mp3Encoder.encodeBuffer(lc, rc)
+      if (mp3Buffer.length > 0) {
+        blocks.push(mp3Buffer)
+      }
+    }
+    mp3Buffer = mp3Encoder.flush()
+    if (mp3Buffer.length > 0) {
+      blocks.push(mp3Buffer)
+    }
+
+    let blob = new Blob(blocks, {type: 'audio/mp3'})
+    let a = document.createElement('a')
+    let url = window.URL.createObjectURL(blob)
+    let filename = name + '-' + Date.now() + '.mp3'
+    a.href = url
+    a.download = filename
+    a.click()
+    window.URL.revokeObjectURL(url)
+  })
+}
+
+
+/* mixer */
+
+export function createMixer(mixerConfig, synthList) {
+  if (mixerConfig.synth.length <= 0) {
+    return
+  }
+  let synthMap = {}
+  synthList.forEach(synth => {
+    synthMap[synth.uuid] = synth
+  })
+  mixer = {
+    volume: mixerConfig.volume
+  } 
+  mixer.synth = mixerConfig.synth.filter(mixedSynth => {
+    return !!synthMap[mixedSynth.uuid]
+  }).map(mixedSynth => {
+    let synthConfig = synthMap[mixedSynth.uuid]
+    return {
+      config: synthConfig,
+      synth: createSynth(synthConfig.synth, false)
+    }
+  })
+}
+
+export function playMixer(volume) {
+  mixer.synth.forEach(synthItem => {
+    let theSynth = synthItem.synth
+    let note = new Tone.Frequency(synthItem.synth.frequency.value).toNote()
+    theSynth.connect(Tone.Master)
+    console.log(synthItem.config.volume * volume)
+    theSynth.volume.setValueAtTime(volume2decibels(synthItem.config.volume * volume), 0)
+    theSynth.triggerAttackRelease(note, synthItem.config.note)
+  })
+}
