@@ -9,16 +9,14 @@
         </button>
       </template>
       <template slot="center">
-        <div class="toolbar-buttons buttons has-addons">
-          <button class="button is-primary is-small" @click="play" :disabled="!canPlay">
-            <span class="icon"><i class="fas fa-play"></i></span>
-            <span>Play</span>
-          </button>
-          <button class="button is-success is-small" @click="exportCurrent" :disabled="!canExport">
-            <span class="icon"><i class="fas fa-save"></i></span>
-            <span>Export</span>
-          </button>
-        </div>
+        <button class="button is-primary is-small" @click="play" :disabled="!canPlay">
+          <span class="icon"><i class="fas fa-play"></i></span>
+          <span>Play</span>
+        </button>
+        <button style="margin-left: 0.5rem;" class="button is-success is-small" @click="exportCurrent" :disabled="!canExport">
+          <span class="icon"><i class="fas fa-save"></i></span>
+          <span>Export</span>
+        </button>
       </template>
       <template slot="right">
         <button style="margin-left: 0.5rem;" class="button is-primary is-small" @click="onSaveClick" :disabled="!savable">
