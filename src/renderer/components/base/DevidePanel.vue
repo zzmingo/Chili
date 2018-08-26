@@ -17,8 +17,8 @@ export default {
 
 .panel {
   position: relative;
-  border: 1px solid $cl-panel-border-color;
-  border-radius: 6px;
+  border: 1px solid #DADADA;
+  border-radius: 0px;
   box-sizing: border-box;
   background-color: white;
   width: 100%;
@@ -33,6 +33,7 @@ export default {
   box-sizing: border-box;
   background-color: inherit;
   padding: 0 0.25rem;
+  background-color: #F9F9F9;
 }
 
 .body {
@@ -40,6 +41,7 @@ export default {
   height: 100%;
   box-sizing: border-box;
   padding: 1rem;
+  background-color: #F9F9F9;
 }
 </style>
 

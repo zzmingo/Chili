@@ -7,7 +7,7 @@
         :key="item.value || item"
         :class="{
           'is-selected': value === (item.value || item),
-          'is-success': value === (item.value || item),
+          'is-primary': value === (item.value || item),
         }"
         @click="$emit('input', item.value || item)"
         >{{item.text || item.value || item}}</span>
@@ -22,5 +22,18 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/assets/styles/all-variables.scss";
+
+.button {
+  background-color: #EDEDED;
+  border: none;
+
+  &:hover {
+    background-color: #DADADA;
+  }
+
+  &.is-primary {
+    background-color: $primary;
+  }
+}
 </style>
 

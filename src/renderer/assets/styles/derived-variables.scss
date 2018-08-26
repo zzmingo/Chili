@@ -1,2 +1,7 @@
-$cl-split-border: 1px solid $border;
-$cl-panel-border-color: $border;
+$primary: #FF5870;
+$info: #8B85A2;
+
+$input-focus-border-color: $primary;
+
+$cl-split-border: 0px solid $grey-lighter;
+$cl-panel-border-color: transparent;

@@ -1,6 +1,6 @@
 <template>
   <div class="field cl-slider">
-    <label class="label is-small">{{label}}: <span class="tag is-success is-pulled-right">{{format(value)}}</span></label>
+    <label class="label is-small">{{label}}: <span class="tag is-info is-pulled-right">{{format(value)}}</span></label>
     <div class="control is-small">
       <input :value="value" @input="$emit('input', parseFloat($event.target.value))" class="slider is-fullwidth" :min="min" :max="max" :step="step" type="range">
     </div>

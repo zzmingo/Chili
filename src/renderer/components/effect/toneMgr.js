@@ -1,3 +1,5 @@
+import fs from 'fs'
+import electron from 'electron'
 import Tone from 'tone'
 import lamejs from 'lamejs'
 
@@ -37,8 +39,19 @@ export function play(noteTime, volume = 1) {
 }
 
 export function exportSynth(activeSynth) {
+  let filePath = electron.remote.dialog.showSaveDialog({
+    defaultPath: (activeSynth.name || 'sound') + '.mp3',
+    filters: [
+      { name: 'All Files', extensions: ['mp3'] }
+    ]
+  })
+  if (!filePath) {
+    return
+  }
+
   let noteTime = activeSynth.note
   let config = activeSynth.synth
+  let bpm = activeSynth.bpm
   let envelope = config.envelope
   let duration = envelope.attack + envelope.decay + envelope.sustain + envelope.release
                 + new Tone.Time(noteTime).toSeconds()
@@ -87,13 +100,14 @@ export function exportSynth(activeSynth) {
     }
 
     let blob = new Blob(blocks, {type: 'audio/mp3'})
-    let a = document.createElement('a')
-    let url = window.URL.createObjectURL(blob)
-    let filename = name + '-' + Date.now() + '.mp3'
-    a.href = url
-    a.download = filename
-    a.click()
-    window.URL.revokeObjectURL(url)
+
+    blobToBuffer(blob, (error, buffer) => {
+      if (error) {
+        console.error(error)
+        return
+      }
+      fs.writeFileSync(filePath, buffer)
+    })
   })
 }
 
@@ -131,4 +145,24 @@ export function playMixer(volume) {
     theSynth.volume.setValueAtTime(volume2decibels(synthItem.config.volume * volume), 0)
     theSynth.triggerAttackRelease(note, synthItem.config.note)
   })
+}
+
+function blobToBuffer (blob, cb) {
+  if (typeof Blob === 'undefined' || !(blob instanceof Blob)) {
+    throw new Error('first argument must be a Blob')
+  }
+  if (typeof cb !== 'function') {
+    throw new Error('second argument must be a function')
+  }
+
+  var reader = new FileReader()
+
+  function onLoadEnd (e) {
+    reader.removeEventListener('loadend', onLoadEnd, false)
+    if (e.error) cb(e.error)
+    else cb(null, Buffer.from(reader.result))
+  }
+
+  reader.addEventListener('loadend', onLoadEnd, false)
+  reader.readAsArrayBuffer(blob)
 }

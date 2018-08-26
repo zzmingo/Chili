@@ -13,7 +13,7 @@
           <span class="icon"><i class="fas fa-play"></i></span>
           <span>Play</span>
         </button>
-        <button style="margin-left: 0.5rem;" class="button is-success is-small" @click="exportCurrent" :disabled="!canExport">
+        <button style="margin-left: 0.5rem;" class="button is-primary is-small" @click="exportCurrent" :disabled="!canExport">
           <span class="icon"><i class="fas fa-save"></i></span>
           <span>Export</span>
         </button>
@@ -35,7 +35,7 @@
     </Toolbar>
     <div class="cl-flex-1 cl-full-width">
       <Splitter :margin="20" :initPercent="20">
-        <div slot="left-pane">
+        <div slot="left-pane" class="left-pane cl-full-height">
           <Tabs :tabs="tabs" v-model="tab">
             <template slot-scope="slotProps">
               <div v-if="slotProps.tab.name === 'synth'" class="cl-flexbox-col-full cl-full-height cl-synth-list">
@@ -58,7 +58,7 @@
             </template>
           </Tabs>
         </div>
-        <div slot="right-pane" class="panel-ct">
+        <div slot="right-pane" class="panel-ct right-pane cl-full-height">
           <div v-show="tab === 'synth'" class="panel-synth columns">
 
             <div v-if="activeSynth" class="column">
@@ -400,6 +400,14 @@ export default {
   padding: 1rem;
 }
 
+.left-pane {
+  background-color: #F5F5F5;
+}
+
+.right-pane {
+  background-color: #F9F9F9;
+}
+
 .cl-mixer-list, .cl-synth-list {
   .item {
     position: relative;
@@ -427,6 +435,7 @@ export default {
       top: 50%;
       transform: translateY(-50%);
       font-size: 0.625rem;
+      background-color: #C1044F;
     }
 
     .name {
