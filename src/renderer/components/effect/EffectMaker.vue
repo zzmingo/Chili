@@ -44,8 +44,9 @@
                   :key="synth.uuid"
                   :class="{ active: activeSynth && synth.uuid === activeSynth.uuid }"
                   @click="onSelectSynth(synth)">
-                  <span class="tag is-small is-info">{{tone.synthTypeTags[synth.type]}}</span>
+                  <span class="tag type is-small is-info">{{tone.synthTypeTags[synth.type]}}</span>
                   <span class="name">{{synth.name}}</span>
+                  <span class="tag copy is-small is-info" @click.stop="onClickCopySynth(synth)">copy</span>
                 </div>
               </div>
               <div v-if="slotProps.tab.name === 'mixer'" class="cl-flexbox-col-full cl-full-height cl-mixer-list">
@@ -53,6 +54,7 @@
                   v-for="mixer in mixerList"
                   :key="mixer.name"
                   :class="{ active: activeMixer && mixer.uuid === activeMixer.uuid }"
+                  @click="onSelectMixer(mixer)"
                   >{{mixer.name}}</div>
               </div>
             </template>
@@ -68,7 +70,7 @@
               <div class="vertical-spacing"></div>
               <DevidePanel title="Play">
                 <ButtonRadio label="Note" v-model="activeSynth.note" :items="tone.notes" />
-                <Slider label="Volume" v-model="activeSynth.volume" :min="0" :max="1" :step="0.01" />
+                <Slider label="Volume" v-model="activeSynth.volume" :input="true" :min="0" :max="1" :step="0.01" />
                 <Slider label="Bpm" v-model="activeSynth.bpm" :min="30" :max="320" :step="30" />
               </DevidePanel>
             </div>
@@ -164,6 +166,7 @@ import path from 'path'
 import fs from 'fs'
 import uuid from 'uuid'
 import Tone from 'tone'
+import Mousetrap from 'mousetrap'
 import EnvelopePanel from './panel/EnvelopePanel.vue'
 import OscillatorPanel from './panel/OscillatorPanel.vue'
 import { synthDefaults, mixerDefaults, mixerSynthDefaults } from '@/data/tone'
@@ -272,6 +275,29 @@ export default {
       }
     }
   },
+  created() {
+
+    const wrapInRoute = (func) => {
+      return () => {
+        if (this.$router.currentRoute.name === "EffectMaker") {
+          func()
+        }
+      }
+    }
+
+    Mousetrap.bind(['command+s', 'ctrl+s'], wrapInRoute(() => {
+      this.onSaveClick()
+    }))
+
+    Mousetrap.bind('space', wrapInRoute(() => {
+      this.schedulePlay()
+    }))
+
+    Mousetrap.bind('backspace', wrapInRoute(() => {
+      this.onClickDeleteItem()
+    }))
+
+  },
   methods: {
     fileBaseName(filePath) {
       return path.basename(filePath)
@@ -373,13 +399,50 @@ export default {
       }
     },
     exportCurrent() {
-      toneMgr.exportSynth(this.activeSynth)
+      toneMgr.exportSynth(recursiveDeepCopy(this.activeSynth))
     },
     onSelectSynth(synth) {
       this.activeSynth = synth
     },
+    onSelectMixer(mixer) {
+      this.activeMixer = mixer
+    },
     onDeleteMixSynthClick(idx, synth) {
       this.activeMixer.synth[idx] = recursiveDeepCopy(mixerSynthDefaults)
+    },
+    onClickDeleteItem() {
+      if (this.tab === "synth") {
+        if (!this.activeSynth) {
+          return
+        }
+        if(!window.confirm('确认删除 ' + this.activeSynth.name + ' ?')) {
+          return
+        }
+        let idx = this.synthList.indexOf(this.activeSynth)
+        if (idx >= 0) {
+          this.synthList.splice(idx, 1)
+          this.activeSynth = null
+        }
+      } else if (this.tab === 'mixer') {
+        if (!this.activeMixer) {
+          return
+        }
+        if(!window.confirm('确认删除 ' + this.activeMixer.name + ' ?')) {
+          return
+        }
+        let idx = this.mixerList.indexOf(this.activeMixer)
+        if (idx >= 0) {
+          this.mixerList.splice(idx, 1)
+          this.activeMixer = null
+        }
+      }
+    },
+    onClickCopySynth(synth) {
+      synth = recursiveDeepCopy(synth)
+      synth.uuid = uuid.v4()
+      synth.name = synth.name + '-copy'
+      this.synthList.push(synth)
+      this.activeSynth = synth
     }
   }
 }
@@ -429,13 +492,31 @@ export default {
 
 .cl-synth-list {
   .item {
-    .tag {
+    .tag.type {
       position: absolute;
       left: 0.5rem;
       top: 50%;
       transform: translateY(-50%);
       font-size: 0.625rem;
-      background-color: #C1044F;
+      background-color: $secondary;
+    }
+
+    .tag.copy {
+      display: none;
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.625rem;
+      background-color: $secondary;
+
+      &:hover {
+        background-color: $info;
+      }
+    }
+
+    &:hover .tag.copy {
+      display: flex;
     }
 
     .name {
@@ -450,8 +531,8 @@ export default {
   .item {
 
     &.active {
-      background-color: $info;
-      color: $info-invert;
+      background-color: $primary;
+      color: $primary-invert;
     }
   }
 }

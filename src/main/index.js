@@ -55,6 +55,8 @@ app.on('activate', () => {
 
 import { autoUpdater } from 'electron-updater'
 
+autoUpdater.allowPrerelease = true
+
 autoUpdater.logger = require("electron-log")
 autoUpdater.logger.transports.file.level = process.env.NODE_ENV === 'production' ? 'info' : false
 autoUpdater.logger.transports.console.level = "debug"

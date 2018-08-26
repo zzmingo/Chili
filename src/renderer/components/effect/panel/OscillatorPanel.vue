@@ -2,7 +2,7 @@
   <DevidePanel title="Oscillator">
     <ButtonRadio label="Source" v-model="oscillator.sourceType" :items="tone.sourceTypes" />
     <ButtonRadio v-if="isFat || isFmAm" label="Type" v-model="oscillator.type" :items="tone.oscillatorTypes" />
-    <Slider label="Frequency" v-model="oscillator.frequency" :min="0" :max="3000" :step="10" :format="toneSuffix('hz')"/>
+    <Slider label="Frequency" v-model="oscillator.frequency" :min="0" :max="3000" :step="1" :format="toneSuffix('hz')"/>
     <Slider label="Detune" v-model="oscillator.detune" :min="0" :max="1" :step="0.01" />
     <Slider label="Phase" v-model="oscillator.phase" :min="0" :max="1" :step="0.01" />
     <Slider v-if="isFmAm" label="Harmonicity" v-model="oscillator.harmonicity" :min="0" :max="1" :step="0.1" />
