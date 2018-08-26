@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, dialog } from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -56,7 +56,12 @@ app.on('activate', () => {
 import { autoUpdater } from 'electron-updater'
 
 autoUpdater.on('update-downloaded', () => {
-  autoUpdater.quitAndInstall()
+  let install = dialog.showMessageBox(mainWindow, {
+    title: '更新',
+    message: '检查到有更新，重启安装？',
+    buttons: ["取消", "重启安装"]
+  })
+  install && autoUpdater.quitAndInstall()
 })
 
 app.on('ready', () => {

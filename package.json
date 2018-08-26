@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "author": "mingo <zzmingo@qq.com>",
   "description": "Sound workstation",
-  "license": null,
+  "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
     "build": "node .electron-vue/build.js && electron-builder",
@@ -45,16 +45,11 @@
     },
     "mac": {
       "icon": "build/icons/icon.icns"
-    },
-    "win": {
-      "icon": "build/icons/icon.ico"
-    },
-    "linux": {
-      "icon": "build/icons"
     }
   },
   "dependencies": {
     "bulma-slider": "^2.0.0",
+    "electron-updater": "^3.1.1",
     "lamejs": "^1.2.0",
     "tone": "^13.2.8",
     "uuid": "^3.3.2",
