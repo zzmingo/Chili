@@ -55,6 +55,30 @@ app.on('activate', () => {
 
 import { autoUpdater } from 'electron-updater'
 
+autoUpdater.logger = require("electron-log")
+autoUpdater.logger.transports.file.level = process.env.NODE_ENV === 'production' ? 'info' : false
+autoUpdater.logger.transports.console.level = "debug"
+
+autoUpdater.on('error', (error) => {
+  console.error(error)
+})
+
+autoUpdater.on('download-progress', (info) => {
+  console.log('downloading ' + info.percent)
+})
+
+autoUpdater.on('checking-for-update', () => {
+  console.log('checking-for-update')
+})
+
+autoUpdater.on('update-available', (info) => {
+  console.log(info)
+})
+
+autoUpdater.on('update-not-available', (info) => {
+  console.log(info)
+})
+
 autoUpdater.on('update-downloaded', () => {
   let install = dialog.showMessageBox(mainWindow, {
     title: '更新',
@@ -65,5 +89,10 @@ autoUpdater.on('update-downloaded', () => {
 })
 
 app.on('ready', () => {
-  if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
+  console.log('check updates ' + process.env.NODE_ENV)
+  if (process.env.NODE_ENV === 'production') {
+    autoUpdater.checkForUpdatesAndNotify()
+  } else {
+    autoUpdater.checkForUpdatesAndNotify()
+  }
 })

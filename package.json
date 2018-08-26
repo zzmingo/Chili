@@ -1,6 +1,6 @@
 {
   "name": "chili",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "mingo <zzmingo@qq.com>",
   "description": "Sound workstation",
   "license": "MIT",
@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "bulma-slider": "^2.0.0",
+    "electron-log": "^2.2.17",
     "electron-updater": "^3.1.1",
     "lamejs": "^1.2.0",
     "tone": "^13.2.8",

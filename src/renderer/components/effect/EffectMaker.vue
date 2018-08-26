@@ -52,7 +52,7 @@
                 <div class="item cl-full-width"
                   v-for="mixer in mixerList"
                   :key="mixer.name"
-                  :class="{ active: mixer.uuid === activeMixer.uuid }"
+                  :class="{ active: activeMixer && mixer.uuid === activeMixer.uuid }"
                   >{{mixer.name}}</div>
               </div>
             </template>
