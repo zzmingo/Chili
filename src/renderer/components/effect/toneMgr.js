@@ -6,33 +6,61 @@ import lamejs from 'lamejs'
 export let synth
 export let mixer = {}
 
+export const synthFactory = {
+  'synth': (config) => {
+    return new Tone.Synth(config)
+  },
+  'membrane': (config) => {
+    return new Tone.MembraneSynth(config)
+  }
+}
+
 function volume2decibels(volume) {
   return 48 * volume - 24
 }
 
-export function createSynth(config, master = true) {
-  switch (config.oscillator.sourceType) {
-    case 'am':
-    case 'fm':
-    case 'fat':
-      config.oscillator.type = config.oscillator.sourceType + config.oscillator.type
+export function createSynth(type, config, master = true) {
+  switch (type) {
+    case 'membrane':
+      Object.keys(config.membrane).forEach(key => {
+        config[key] = config.membrane[key]
+      })
+      delete config.membrane
+      Object.keys(config.oscillator).forEach(key => {
+        if (key !== 'type') {
+          delete config.oscillator[key]
+        }
+      })
       break
-    case 'pulse':
-    case 'pwm':
-      config.oscillator.type = config.oscillator.sourceType
-    default:
+    case 'synth':
+      switch (config.oscillator.sourceType) {
+        case 'am':
+        case 'fm':
+        case 'fat':
+          config.oscillator.type = config.oscillator.sourceType + config.oscillator.type
+          break
+        case 'pulse':
+        case 'pwm':
+          config.oscillator.type = config.oscillator.sourceType
+        default:
+      }
+      delete config.oscillator.sourceType
+      break
   }
-  delete config.oscillator.sourceType
+
+  let factory = synthFactory[type]
   if (master) {
-    synth = new Tone.Synth(config)
+    if (synth) {
+      synth.disconnect(Tone.Master)
+    }
+    synth = factory(config)
   } else {
-    return new Tone.Synth(config)
+    return factory(config)
   }
 }
 
-export function play(noteTime, volume = 1) {
+export function play(note, noteTime, volume = 1) {
   let theSynth = synth
-  let note = new Tone.Frequency(theSynth.frequency.value).toNote()
   theSynth.connect(Tone.Master)
   theSynth.volume.setValueAtTime(volume2decibels(volume), 0)
   theSynth.triggerAttackRelease(note, noteTime)

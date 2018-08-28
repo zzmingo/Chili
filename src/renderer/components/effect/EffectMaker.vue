@@ -69,16 +69,34 @@
               </DevidePanel>
               <div class="vertical-spacing"></div>
               <DevidePanel title="Play">
+                <Slider label="Frequency" v-model="activeSynth.frequency" :min="0" :max="3000" :step="1" :format="toneSuffix('hz')"/>
                 <ButtonRadio label="Note" v-model="activeSynth.note" :items="tone.notes" />
                 <Slider label="Volume" v-model="activeSynth.volume" :input="true" :min="0" :max="1" :step="0.01" />
                 <Slider label="Bpm" v-model="activeSynth.bpm" :min="30" :max="320" :step="30" />
               </DevidePanel>
+
+              <div class="vertical-spacing"></div>
+
             </div>
 
             <!-- normal synth -->
             <template v-if="activeSynth && activeSynth.type === 'synth'">
               <div class="column">
                 <OscillatorPanel :oscillator.sync="activeSynth.synth.oscillator" />
+              </div>
+              <div class="column">
+                <EnvelopePanel :envelope.sync="activeSynth.synth.envelope" />
+              </div>
+            </template>
+
+            <!-- membrane synth -->
+            <template v-if="activeSynth && activeSynth.type === 'membrane'">
+              <div class="column">
+                <DevidePanel v-if="activeSynth.type === 'membrane'" title="Membrane">
+                  <Slider label="Picth Delay" v-model="activeSynth.synth.membrane.pitchDelay" :min="0" :max="1" :step="0.01" />
+                  <Slider label="Octaves" v-model="activeSynth.synth.membrane.octaves" :min="1" :max="30" :step="1" />
+                  <ButtonRadio label="Type" v-model="activeSynth.synth.oscillator.type" :items="tone.oscillatorTypes" />
+                </DevidePanel>
               </div>
               <div class="column">
                 <EnvelopePanel :envelope.sync="activeSynth.synth.envelope" />
@@ -218,7 +236,7 @@ export default {
       // toolbar
       newMenus: [
         { text: 'New Synth', value: 'synth' },
-        // { text: 'New AM Synth', value: 'amsynth' },
+        { text: 'New Membrane Synth', value: 'membrane' },
         // { text: 'New FM Synth', value: 'fmsynth' },
       ],
 
@@ -387,9 +405,10 @@ export default {
       if (this.tab === "synth") {
         if (this.synthChanged) {
           this.synthChanged = false
-          toneMgr.createSynth(recursiveDeepCopy(this.activeSynth.synth))
+          toneMgr.createSynth(this.activeSynth.type, recursiveDeepCopy(this.activeSynth.synth))
         }
-        toneMgr.play(this.activeSynth.note, this.activeSynth.volume)
+        let note = new Tone.Frequency(this.activeSynth.frequency).toNote()
+        toneMgr.play(note, this.activeSynth.note, this.activeSynth.volume)
       } else if (this.tab === "mixer") {
         if (this.mixerChanged) {
           this.mixerChanged = false

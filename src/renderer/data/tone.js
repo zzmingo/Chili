@@ -36,6 +36,7 @@ export const notes = [
 
 export const synthTypeTags = {
   'synth': 'SNTH',
+  'membrane': "MEMB",
 }
 
 export const envelope = {
@@ -47,7 +48,6 @@ export const envelope = {
 }
 
 export const omniOscillator = {
-  frequency : 440,
   detune : 0,
   sourceType: 'osc',
   type : "sine",
@@ -75,7 +75,27 @@ export const synthDefaults = {
     note: '8n',
     volume: 0.5,
     bpm: 120,
+    frequency: 440,
     synth
+  },
+  membrane: {
+    uuid: '',
+    name: 'membrane',
+    type: 'membrane',
+    note: '8n',
+    volume: 0.5,
+    bpm: 120,
+    frequency: 440,
+    synth: {
+      membrane: {
+        pitchDelay  : 0.05 ,
+        octaves  : 10 ,
+      },
+      oscillator: {
+        type: 'sine'
+      },
+      envelope,
+    }
   }
 }
 
