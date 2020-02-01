@@ -1,8 +1,8 @@
-# chili
+# Chili - a sound workstation
 
 <img src="build/icons/256x256.png" width=80>
 
-> Sound workstation
+#### Screenshot
 
 <img src="screenshot.png">
 
