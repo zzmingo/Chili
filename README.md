@@ -1,5 +1,7 @@
 # chili
 
+<img src="build/icons/256x256.png" width=80>
+
 > Sound workstation
 
 #### Build Setup
