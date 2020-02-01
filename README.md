@@ -4,6 +4,8 @@
 
 > Sound workstation
 
+<img src="screenshot.png">
+
 #### Build Setup
 
 ``` bash
